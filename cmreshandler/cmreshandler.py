@@ -1,14 +1,22 @@
-""" Elasticsearch logging handler
+""" Elasticsearch Logging Handler
+
+Send Python logging records to an Elasticsearch index.
 """
 
+import datetime
 import logging
+import socket
+from threading import Timer
+
 from enum import Enum
 from elasticsearch import helpers as eshelpers
 from elasticsearch import Elasticsearch, RequestsHttpConnection
-from requests_kerberos import HTTPKerberosAuth, DISABLED
-import datetime
-import socket
-from threading import Timer
+
+try:
+    from requests_kerberos import HTTPKerberosAuth, DISABLED
+    HAS_KERBEROS = True
+except ImportError:
+    HAS_KERBEROS = False
 
 
 class CMRESHandler(logging.Handler):
@@ -125,6 +133,9 @@ class CMRESHandler(logging.Handler):
                                  verify_certs=self.verify_certs,
                                  connection_class=RequestsHttpConnection)
         elif self.auth_type == CMRESHandler.AuthType.KERBEROS_AUTH:
+            if HAS_KERBEROS:
+                raise ValueError('Kerberos not available! '
+                    'Install "requests_kerberos" to use it.')
             return Elasticsearch(hosts=self.hosts,
                                  use_ssl=self.use_ssl,
                                  verify_certs=self.verify_certs,
