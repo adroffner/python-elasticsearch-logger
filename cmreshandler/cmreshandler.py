@@ -105,8 +105,8 @@ class CMRESHandler(logging.Handler):
         self.flush_frequency_in_sec = flush_frequency_in_sec
         self.es_index_name = es_index_name
         self.es_doc_type = es_doc_type
-        self.es_additional_fileds = es_additional_fields.copy()
-        self.es_additional_fileds.update({'host': socket.gethostname(),
+        self.es_additional_fields = es_additional_fields.copy()
+        self.es_additional_fields.update({'host': socket.gethostname(),
                                           'host_ip': socket.gethostbyname(socket.gethostname())})
         self.raise_on_indexing_exceptions = raise_on_indexing_exceptions
 
@@ -133,7 +133,7 @@ class CMRESHandler(logging.Handler):
                                  verify_certs=self.verify_certs,
                                  connection_class=RequestsHttpConnection)
         elif self.auth_type == CMRESHandler.AuthType.KERBEROS_AUTH:
-            if HAS_KERBEROS:
+            if not HAS_KERBEROS:
                 raise ValueError('Kerberos not available! '
                     'Install "requests_kerberos" to use it.')
             return Elasticsearch(hosts=self.hosts,
@@ -210,7 +210,7 @@ class CMRESHandler(logging.Handler):
         :param record: A class of type ```logging.LogRecord```
         :return: None
         """
-        rec = self.es_additional_fileds.copy()
+        rec = self.es_additional_fields.copy()
         for k, v in record.__dict__.items():
             if k not in CMRESHandler.__LOGGING_FILTER_FIELDS:
                 rec[k] = "" if v is None else v
