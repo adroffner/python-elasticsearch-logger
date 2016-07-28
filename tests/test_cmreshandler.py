@@ -4,7 +4,7 @@ import time
 import os
 import sys
 sys.path.insert(0, os.path.abspath('.'))
-from cmreshandler.cmreshandler import CMRESHandler
+from cmreshandler.handlers import CMRESHandler
 
 
 class CMRESHandlerTestCase(unittest.TestCase):
